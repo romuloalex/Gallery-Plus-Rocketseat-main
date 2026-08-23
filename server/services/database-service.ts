@@ -1,15 +1,15 @@
-import { readFile, writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import { join, resolve } from 'path';
-import { Database } from '../models';
+import { readFile, writeFile, mkdir } from "fs/promises";
+import { existsSync } from "fs";
+import { join, resolve } from "path";
+import type { Database } from "../models";
 
 export class DatabaseService {
   private dbPath: string;
   private dataDir: string;
 
   constructor() {
-    this.dataDir = resolve(process.cwd(), 'data');
-    this.dbPath = join(this.dataDir, 'db.json');
+    this.dataDir = resolve(process.cwd(), "data");
+    this.dbPath = join(this.dataDir, "db.json");
   }
 
   async initialize(): Promise<void> {
@@ -28,7 +28,7 @@ export class DatabaseService {
       const initialData: Database = {
         photos: [],
         albums: [],
-        photosOnAlbums: []
+        photosOnAlbums: [],
       };
       await this.writeDatabase(initialData);
     }
@@ -36,14 +36,14 @@ export class DatabaseService {
 
   async readDatabase(): Promise<Database> {
     try {
-      const data = await readFile(this.dbPath, 'utf8');
+      const data = await readFile(this.dbPath, "utf8");
       return JSON.parse(data);
     } catch (error) {
-      console.error('Error reading database:', error);
+      console.error("Error reading database:", error);
       const emptyDb: Database = {
         photos: [],
         albums: [],
-        photosOnAlbums: []
+        photosOnAlbums: [],
       };
       await this.writeDatabase(emptyDb);
       return emptyDb;
@@ -54,8 +54,8 @@ export class DatabaseService {
     try {
       await writeFile(this.dbPath, JSON.stringify(data, null, 2));
     } catch (error) {
-      console.error('Error writing database:', error);
-      throw new Error('Failed to write to database');
+      console.error("Error writing database:", error);
+      throw new Error("Failed to write to database");
     }
   }
-} 
+}
