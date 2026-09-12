@@ -1,12 +1,15 @@
-// Importa a função 'tv' para criar variantes CSS e 'VariantProps' para capturar a tipagem delas
 import { tv, type VariantProps } from "tailwind-variants";
-// Importa o SVG do ícone de check (o "?react" indica que o construtor Vite transformará o SVG num componente React)
 import CheckIcon from "../assets/icons/check.svg?react";
-// Importa o componente embrulho de ícones padronizado do projeto
 import Icon from "./icon";
 
-// Estilos do contêiner externo (a tag <label>)
+/**
+ * Variantes de estilo para o contêiner raiz do componente (tag <label>).
+ * Utiliza o modificador 'group' do Tailwind para permitir que elementos filhos
+ * reajam ao estado de 'hover' aplicado à label inteira.
+ */
 export const InputCheckboxWrapperVariants = tv({
+  // WARNING: A presença de comentários (//) dentro de uma template string injetará esses
+  // caracteres no atributo 'className' final do HTML, o que pode gerar classes CSS inválidas.
   base: `
         // 'inline-flex' alinha na mesma linha sem ocupar 100% da largura, 'relative' permite sobrepor o ícone dentro dele
         // 'group' cria uma marcação para que os elementos filhos saibam quando a label toda recebe hover
@@ -14,7 +17,6 @@ export const InputCheckboxWrapperVariants = tv({
     `,
   variants: {
     disabled: {
-      // Remove as interações de clique e deixa a label semi-transparente quando desativada
       true: "pointer-events-none opacity-80",
     },
   },
@@ -23,8 +25,13 @@ export const InputCheckboxWrapperVariants = tv({
   },
 });
 
-// Estilos aplicados diretamente na tag nativa <input>
+/**
+ * Variantes de estilo para a tag nativa <input type="checkbox">.
+ * A lógica central depende da classe 'appearance-none' para ocultar o estilo nativo
+ * do SO/Navegador, e da classe 'peer' para atuar como emissor de estado (checked) para o ícone vizinho.
+ */
 export const InputCheckboxVariants = tv({
+  // WARNING: Comentários (//) dentro da template string também presentes aqui.
   base: `
         // 'appearance-none' é a mágica aqui: apaga o visual padrão de checkbox do sistema operacional/navegador!
         // 'peer' marca o input como uma referência de estado (checado/não checado) para elementos vizinhos
@@ -45,7 +52,6 @@ export const InputCheckboxVariants = tv({
             `,
     },
     size: {
-      // Medidas exatas do quadrado para os tamanhos pequeno e médio
       sm: "w-3 h-3 rounded-sm",
       md: "w-5 h-5 rounded-sm",
     },
@@ -56,8 +62,13 @@ export const InputCheckboxVariants = tv({
   },
 });
 
-// Estilos para o ícone de "V" (check)
+/**
+ * Variantes de estilo para o ícone de marcação (check).
+ * Utiliza posicionamento absoluto para sobrepor o input invisível e a classe 'peer-checked:block'
+ * para renderização condicional baseada no estado do input vizinho.
+ */
 export const InputCheckboxIconVariants = tv({
+  // WARNING: Comentários (//) dentro da template string.
   base: `
         // Posiciona o ícone de forma absoluta, centralizado verticalmente usando top-1/2 e -translate-y-1/2
         absolute top-1/2 -translate-y-1/2
@@ -67,7 +78,6 @@ export const InputCheckboxIconVariants = tv({
     `,
   variants: {
     size: {
-      // Tamanho e ajuste milimétrico de posição (left) para encaixar no quadrado certo
       sm: "w-3 h-3 left-px",
       md: "w-4 h-4 left-0.5",
     },
@@ -77,31 +87,42 @@ export const InputCheckboxIconVariants = tv({
   },
 });
 
-// Une as propriedades customizadas (variant, size) com os atributos HTML padrão de um <input>
-// Omitimos a prop 'size' do HTML nativo para evitar conflito com a nossa prop de variante 'size'
+/**
+ * Interface de propriedades do InputCheckbox.
+ * Decisão Técnica: Omitimos o atributo 'size' nativo do <input> para evitar colisão
+ * de tipagem com a propriedade 'size' gerada pelo tailwind-variants.
+ */
 interface InputCheckboxProps
   extends
     VariantProps<typeof InputCheckboxVariants>,
     Omit<React.ComponentProps<"input">, "size"> {}
 
-// Função que renderiza o componente na tela
+/**
+ * Componente InputCheckbox controlado/não-controlado.
+ * Encapsula a lógica visual de um checkbox customizado, mantendo a acessibilidade e
+ * o comportamento semântico da tag HTML original.
+ *
+ * @param props - Desestrutura variant, size, disabled, className e repassa as demais props nativas ao input.
+ */
 export default function InputCheckbox({
   variant,
   size,
   disabled,
   className,
-  ...props // Agrupa o resto das props (onChange, checked, name, value, etc)
+  ...props
 }: InputCheckboxProps) {
-  // Renderiza a label como base clicável
+  // TODO: O componente não expõe suporte para `ref` nativo, limitando a integração
+  // com bibliotecas de manipulação de formulários (ex: react-hook-form) ou foco programático.
   return (
     <label className={InputCheckboxWrapperVariants({ className, disabled })}>
-      {/* O input verdadeiro. Ele fica invisível (graças ao appearance-none), mas ainda registra o clique e o foco */}
       <input
         type="checkbox"
         className={InputCheckboxVariants({ variant, size })}
+        // TODO: A propriedade 'disabled' no input não está sendo recebida como atributo HTML.
+        // Ela é passada para a classe do wrapper, mas o input nativo ainda pode receber
+        // foco pelo teclado e ser alternado se não for explicitamente desabilitado aqui.
         {...props}
       />
-      {/* O ícone de check. Fica observando o input através da classe peer-checked */}
       <Icon svg={CheckIcon} className={InputCheckboxIconVariants({ size })} />
     </label>
   );
