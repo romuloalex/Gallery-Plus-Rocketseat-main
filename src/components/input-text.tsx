@@ -33,7 +33,7 @@ export const InputTextWrapperVariant = tv({
     },
     disabled: {
       // Quando desabilitado, o wrapper bloqueia eventos de clique para impedir interação do usuário.
-      true: "pointer-events-none",
+      true: "pointer-events-none opacity-50 bg-neutral-100",
       // TODO: Ainda falta feedback visual mais explícito, como opacidade ou fundo cinza no estado desabilitado.
     },
   },
